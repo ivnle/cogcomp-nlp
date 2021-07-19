@@ -251,7 +251,7 @@ public class Quantifier extends Annotator {
 
     public static void main(String args[]) throws Throwable {
         Quantifier quantifier = new Quantifier();
-        quantifier.trainOnAll();
+        //quantifier.trainOnAll();
         quantifier.test();
     }
 }
