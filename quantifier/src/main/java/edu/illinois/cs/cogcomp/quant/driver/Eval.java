@@ -21,6 +21,7 @@ import edu.illinois.cs.cogcomp.quant.standardize.Normalizer;
 import edu.illinois.cs.cogcomp.lbjava.classify.TestDiscrete;
 import edu.illinois.cs.cogcomp.lbjava.learn.BatchTrainer;
 import edu.illinois.cs.cogcomp.nlp.utility.TokenizerTextAnnotationBuilder;
+import com.fasterxml.jackson.databind.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -31,10 +32,22 @@ public class Eval {
     
 
     public static void main(String args[]) throws Throwable {
+        // String src;
+        
+        File inputFile = new File(args[0]);
+        // Read a jsonl file
+        // src = "data/input2.jsonl";
+        MappingIterator<Example> iterator = new ObjectMapper().readerFor(Example.class).readValues(inputFile);
+        List<Example> examples = iterator.readAll();
+        
         Quantifier quantifier = new Quantifier();
         quantifier.doInitialize();
-        //quantifier.trainOnAll();
-        //quantifier.test();
+        
+        for (Example e : examples) {
+            List<QuantSpan> output = quantifier.getSpans(e.text, true, null);
+            System.out.println(output);
+        }
+
         
     }
 }
