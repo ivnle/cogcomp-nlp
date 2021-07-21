@@ -18,12 +18,13 @@ public class Quantity implements Serializable {
 
     private static final long serialVersionUID = -996750464077246098L;
     public String phrase;
-    public String bound, units;
+    public String bound, units, unit_span, value_span;
     public Double value;
 
     public Quantity(String bound, Double value, String units) {
         this.bound = bound;
         this.value = value;
+        this.unit_span = units;
         this.units = units;
         this.phrase = "";
     }
@@ -82,7 +83,7 @@ public class Quantity implements Serializable {
     }
 
     public String toString() {
-        return "[" + this.bound + " " + this.value + " " + this.units + "]";
+        return "[" + this.bound + " " + this.value + " " + this.units + " " +  this.unit_span + "]";
     }
 
     public static void main(String args[]) {
