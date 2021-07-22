@@ -32,7 +32,20 @@ import java.util.regex.Pattern;
 import java.io.File;
 
 public class Eval {
-    
+
+    // Convert quantity obect to num_unit object
+    public static NumUnit convertQuantity(Quantity quantity, Example example, QuantSpan quantSpan) {
+        NumUnit numUnit = new NumUnit();
+        numUnit.span = example.text.substring(quantSpan.start, quantSpan.end+1); // BIO tagged span
+        numUnit.span_start = quantSpan.start; // start index of BIO tagged span
+        numUnit.span_end = quantSpan.end; // end index of BIO tagged span
+        numUnit.num = quantity.value; // normalized and extracted number
+        numUnit.unit = quantity.units.trim(); // extracted unit (not neccessarily the unit span)
+        numUnit.unit_span = quantity.unit_span.trim(); // our best guess of the unit span
+        numUnit.num_span = numUnit.span.replace(numUnit.unit_span, "").trim(); // our best guess of the number span
+        numUnit.phrase = quantity.phrase; // processed BIO tagged span
+        return numUnit;
+    }
 
     public static void main(String args[]) throws Throwable {
 
@@ -44,49 +57,41 @@ public class Eval {
         Quantifier quantifier = new Quantifier();
         quantifier.doInitialize();
         
-        final File outputFile = new File("data/data.ldjson");
-
-        /* ObjectMapper mapper = new ObjectMapper();
-        try (SequenceWriter seq = mapper.writer()
-        .withRootValueSeparator("\n") // Important! Default value separator is single space
-        .writeValues(outputFile)) {
-            IdValue value = ...;
-            seq.write(value);
-        } */
+        // TODO update path username
+        final File outputFile = new File("/home/abtnm/units-eval/cogcomp-nlp/quantifier/data/output.jsonl");
 
         ObjectMapper mapper = new ObjectMapper();
         SequenceWriter seq = mapper.writer()
         .withRootValueSeparator("\n") // Important! Default value separator is single space
         .writeValues(outputFile);
 
-        // ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         // Process examples and write to jsonl file
         for (Example e : examples) {
-            List<QuantSpan> quant_spans = quantifier.getSpans(e.text, true, null);
-            
-            List<NumUnit> num_units = new ArrayList<NumUnit>();
-            for (QuantSpan q : quant_spans) {
+            List<QuantSpan> quantSpans = quantifier.getSpans(e.text, true, null);            
+            List<NumUnit> numUnits = new ArrayList<NumUnit>();
+
+            for (QuantSpan q : quantSpans) {
+
                 if (q.object instanceof Quantity) {
                     Quantity quantity = (Quantity) q.object;
-                    NumUnit num_unit = new NumUnit();
-                    num_unit.num = quantity.value;
-                    num_unit.unit = quantity.units.trim();
-                    num_unit.unit_span = quantity.unit_span.trim();
-                    num_unit.num_unit_span = quantity.phrase.trim();
-
-                    num_unit.num_span = num_unit.num_unit_span.replace(num_unit.unit_span, "").trim();
-
-                    num_units.add(num_unit);
+                    numUnits.add(convertQuantity(quantity, e, q));
                 }                
+                if (q.object instanceof Range) {
+                    Range range = (Range) q.object;
+                    numUnits.add(convertQuantity(range.begins, e, q));
+                    numUnits.add(convertQuantity(range.ends, e, q));
+                }
+                if (q.object instanceof Ratio) {                
+                    Ratio ratio = (Ratio) q.object;
+                    numUnits.add(convertQuantity(ratio.numerator, e, q));
+                    numUnits.add(convertQuantity(ratio.denominator, e, q));
+                }
             }
             
             Example prediction = new Example();
             prediction.id = e.id;
             prediction.text = e.text;
-            prediction.num_units = num_units;
-
-            // System.out.println(quant_spans);
-            // currently overwrites previous example
+            prediction.num_units = numUnits;
             seq.write(prediction);
         }
 

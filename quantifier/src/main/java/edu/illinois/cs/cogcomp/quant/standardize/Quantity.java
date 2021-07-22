@@ -24,7 +24,7 @@ public class Quantity implements Serializable {
     public Quantity(String bound, Double value, String units) {
         this.bound = bound;
         this.value = value;
-        this.unit_span = units;
+        this.unit_span = units; // new
         this.units = units;
         this.phrase = "";
     }
