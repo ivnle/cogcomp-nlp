@@ -1,17 +1,11 @@
 package edu.illinois.cs.cogcomp.quant.driver;
 
+import java.util.List;
+
 public class NumUnit {
-    public String span;
-    public Integer span_start;
-    public Integer span_end;
-    public String unit_span;
-    public String unit;
-    public String num_span;
-    public String phrase;
-    public Double num;
-
-    public String toString() {
-        return this.num_span;
-    }
-
+    public List<Integer> num_span;
+    public Double num; // normalized number
+    public List<Integer> unit_span;
+    public String unit; // normalized unit
+    public List<Integer> num_unit_span;
 }

@@ -35,15 +35,17 @@ public class Eval {
 
     // Convert quantity obect to num_unit object
     public static NumUnit convertQuantity(Quantity quantity, Example example, QuantSpan quantSpan) {
+        
         NumUnit numUnit = new NumUnit();
-        numUnit.span = example.text.substring(quantSpan.start, quantSpan.end+1); // BIO tagged span
-        numUnit.span_start = quantSpan.start; // start index of BIO tagged span
-        numUnit.span_end = quantSpan.end; // end index of BIO tagged span
+        
+        List<Integer> num_unit_span = new ArrayList<Integer>();
+        num_unit_span.add(quantSpan.start);
+        num_unit_span.add(quantSpan.end+1);
+        numUnit.num_unit_span = num_unit_span;
+
         numUnit.num = quantity.value; // normalized and extracted number
         numUnit.unit = quantity.units.trim(); // extracted unit (not neccessarily the unit span)
-        numUnit.unit_span = quantity.unit_span.trim(); // our best guess of the unit span
-        numUnit.num_span = numUnit.span.replace(numUnit.unit_span, "").trim(); // our best guess of the number span
-        numUnit.phrase = quantity.phrase; // processed BIO tagged span
+        
         return numUnit;
     }
 
@@ -57,9 +59,9 @@ public class Eval {
         Quantifier quantifier = new Quantifier();
         quantifier.doInitialize();
         
-        // TODO update path username
-        final File outputFile = new File("/home/abtnm/units-eval/cogcomp-nlp/quantifier/data/output.jsonl");
+        final File outputFile = new File("data/output.jsonl");
 
+        // Init jsonl writer
         ObjectMapper mapper = new ObjectMapper();
         SequenceWriter seq = mapper.writer()
         .withRootValueSeparator("\n") // Important! Default value separator is single space
