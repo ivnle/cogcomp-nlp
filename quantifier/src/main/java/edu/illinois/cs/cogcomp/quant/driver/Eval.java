@@ -43,7 +43,7 @@ public class Eval {
         num_unit_span.add(quantSpan.end+1);
         numUnit.num_unit_span = num_unit_span;
 
-        numUnit.num = quantity.value; // normalized and extracted number
+        numUnit.num = quantity.value.toString(); // normalized and extracted number
         numUnit.unit = quantity.units.trim(); // extracted unit (not neccessarily the unit span)
         
         return numUnit;
