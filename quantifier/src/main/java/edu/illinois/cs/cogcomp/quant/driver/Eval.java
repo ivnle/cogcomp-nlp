@@ -53,13 +53,15 @@ public class Eval {
 
         // Read a jsonl file as list of example objects
         File inputFile = new File(args[0]);        
+        File outputFile = new File(args[1]);        
+
         MappingIterator<Example> iterator = new ObjectMapper().readerFor(Example.class).readValues(inputFile);
         List<Example> examples = iterator.readAll();
         
         Quantifier quantifier = new Quantifier();
         quantifier.doInitialize();
         
-        final File outputFile = new File("data/output.jsonl");
+        //final File outputFile = new File("data/output.jsonl");
 
         // Init jsonl writer
         ObjectMapper mapper = new ObjectMapper();
